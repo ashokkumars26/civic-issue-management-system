@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Civic Issue Management System{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1 class="login-title">Create Account</h1>
+      <p class="login-subtitle">Join the Civic Issue Management System</p>
+    </div>
+
+    <form method="POST" class="login-form" id="registerForm">
+      <div class="form-group">
+        <label for="username" class="form-label">Username *</label>
+        <input type="text" id="username" name="username" class="form-input" required placeholder="Choose a username">
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password *</label>
+        <input type="password" id="password" name="password" class="form-input" required placeholder="Create a password">
+      </div>
+
+      <div class="form-group">
+        <label for="confirm_password" class="form-label">Confirm Password *</label>
+        <input type="password" id="confirm_password" name="confirm_password" class="form-input" required placeholder="Confirm your password">
+      </div>
+
+      <div class="form-group">
+        <label for="name" class="form-label">Full Name</label>
+        <input type="text" id="name" name="name" class="form-input" placeholder="Your full name">
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" name="email" class="form-input" placeholder="your.email@example.com">
+      </div>
+
+      <div class="form-group">
+        <label for="phone" class="form-label">Phone</label>
+        <input type="tel" id="phone" name="phone" class="form-input" placeholder="Your phone number">
+      </div>
+
+      {% if can_register_admin %}
+      <div class="form-group">
+        <label for="role" class="form-label">Role</label>
+        <select id="role" name="role" class="form-select">
+          <option value="user" selected>User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      {% endif %}
+
+      <button type="submit" class="login-btn" id="registerBtn">
+        <span class="btn-text">Create Account</span>
+        <div class="btn-spinner" id="btnSpinner"></div>
+      </button>
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+    <div class="error-messages">
+      {% for category, message in messages %}
+      <div class="error-message error-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="login-footer">
+      <p>Already have an account? <a href="{{ url_for('login') }}" class="register-link">Sign In</a></p>
+      <p><strong>Demo Credentials:</strong></p>
+      <p><strong>User:</strong> user / password</p>
+      <p><strong>Admin:</strong> admin / admin123</p>
+    </div>
+  </div>
+</div>
+
+<style>
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 120px);
+  padding: 2rem;
+}
+
+.login-card {
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  padding: 3rem;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #4a5568;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-title {
+  color: #e2e8f0;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  color: #a0aec0;
+  font-size: 1rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  background: #1a202c;
+  border: 2px solid #4a5568;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 1rem;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.1);
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: #718096;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(72, 187, 120, 0.3);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+.btn-text {
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+
+.btn-spinner {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.error-messages {
+  margin-top: 1rem;
+}
+
+.error-message {
+  background: #fed7d7;
+  border: 1px solid #feb2b2;
+  border-radius: 6px;
+  color: #c53030;
+  font-size: 0.9rem;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.login-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #4a5568;
+  text-align: center;
+  color: #a0aec0;
+  font-size: 0.85rem;
+}
+
+.login-footer p {
+  margin: 0.25rem 0;
+}
+
+.login-footer strong {
+  color: #e2e8f0;
+}
+
+.register-link {
+  color: #63b3ed;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 1rem;
+  }
+
+  .login-card {
+    padding: 2rem;
+  }
+
+  .login-title {
+    font-size: 1.5rem;
+  }
+}
+</style>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+  const btn = document.getElementById('registerBtn');
+  const btnText = document.querySelector('.btn-text');
+  const spinner = document.getElementById('btnSpinner');
+
+  btn.disabled = true;
+  btnText.style.opacity = '0';
+  spinner.style.display = 'block';
+
+  // Re-enable after 2 seconds if no redirect (for demo purposes)
+  setTimeout(() => {
+    btn.disabled = false;
+    btnText.style.opacity = '1';
+    spinner.style.display = 'none';
+  }, 2000);
+});
+
+// Password confirmation validation
+document.getElementById('confirm_password').addEventListener('input', function() {
+  const password = document.getElementById('password').value;
+  const confirmPassword = this.value;
+
+  if (password !== confirmPassword) {
+    this.setCustomValidity('Passwords do not match');
+  } else {
+    this.setCustomValidity('');
+  }
+});
+</script>
+{% endblock %}

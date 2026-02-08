@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Civic Issue Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body class="theme-dark">
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-logo"></span>
+          <div class="brand-text">
+            <div class="brand-title">Civic Issue Mangement</div>
+            <div class="brand-subtitle">Smart Civic Issue Management</div>
+          </div>
+        </div>
+        <nav class="app-nav">
+          {% if session.get('user_id') %}
+            {% if session.get('role') == 'admin' %}
+              <a href="{{ url_for('admin_dashboard') }}" class="nav-link {% if request.path.startswith('/admin') %}active{% endif %}">Admin Dashboard</a>
+            {% else %}
+              <a href="{{ url_for('user_dashboard') }}" class="nav-link {% if request.path.startswith('/user') %}active{% endif %}">Citizen Dashboard</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+          {% endif %}
+        </nav>
+      </header>
+
+      <main class="app-main">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+      </main>
+
+      <footer class="app-footer">
+        <span>Prototype - Dark-Themed AI-Assisted Civic Issue Management </span>
+      </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+  </html>
+
+
+
+

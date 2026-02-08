@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="layout-vertical">
+  <div class="card card-accent">
+    <h2 class="card-title">Admin Overview</h2>
+    <p class="card-subtitle">Monitor, prioritize, and resolve civic issues across Chennai.</p>
+    <div class="admin-metrics">
+      <div class="metric-tile metric-total">
+        <div class="metric-label">Total Issues</div>
+        <div class="metric-value">{{ total }}</div>
+      </div>
+      <div class="metric-tile metric-pending">
+        <div class="metric-label">Pending</div>
+        <div class="metric-value">{{ pending }}</div>
+      </div>
+      <div class="metric-tile metric-resolved">
+        <div class="metric-label">Resolved</div>
+        <div class="metric-value">{{ resolved }}</div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <form method="GET" action="{{ url_for('admin_dashboard') }}">
+        <label for="status">Filter by status:</label>
+        <select id="status" name="status" onchange="this.form.submit()">
+          <option value="">All</option>
+          <option value="Pending" {% if request.args.get('status')=='Pending' %}selected{% endif %}>Pending</option>
+          <option value="In Progress" {% if request.args.get('status')=='In Progress' %}selected{% endif %}>In Progress</option>
+          <option value="Resolved" {% if request.args.get('status')=='Resolved' %}selected{% endif %}>Resolved</option>
+        </select>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Issue Management</h2>
+    <p class="card-subtitle">Update statuses, add remarks, and upload after-fix images.</p>
+    <div class="issues-table">
+      {% if issues %}
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Area</th>
+            <th>Citizen</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for issue in issues %}
+          <tr>
+            <td>#{{ issue.id }}</td>
+            <td>{{ issue.issue_type }}</td>
+            <td>{{ issue.area }}</td>
+            <td>
+              {% if issue.user %}
+                {{ issue.user.name or 'Citizen' }}<br />
+                <span class="cell-subtext">{{ issue.user.email or 'Email N/A' }}</span>
+              {% else %}
+                Citizen
+              {% endif %}
+            </td>
+            <td><span class="status-pill status-{{ issue.current_status|lower }}">{{ issue.current_status }}</span></td>
+            <td>{{ issue.created_at.strftime('%d %b %Y') }}</td>
+            <td>
+              <details class="admin-details">
+                <summary>View &amp; Update</summary>
+                <div class="admin-details-body">
+                  <p class="admin-description">{{ issue.description }}</p>
+                  {% if issue.ai_summary %}
+                  <div class="ai-summary small">
+                    <div class="ai-badge">AI Analysis</div>
+                    <pre>{{ issue.ai_summary }}</pre>
+                  </div>
+                  {% endif %}
+
+                  <div class="admin-location">
+                    <strong>Location:</strong> {{ issue.area }},
+                    {{ issue.street or 'Street N/A' }},
+                    {{ issue.landmark or 'Landmark N/A' }}
+                  </div>
+
+                  <form method="POST" action="{{ url_for('update_issue', issue_id=issue.id) }}" enctype="multipart/form-data" class="admin-update-form">
+                    <div class="field-grid-two">
+                      <div class="field">
+                        <label for="status-{{ issue.id }}">Status</label>
+                        <select id="status-{{ issue.id }}" name="status">
+                          <option value="Pending" {% if issue.current_status=='Pending' %}selected{% endif %}>Pending</option>
+                          <option value="In Progress" {% if issue.current_status=='In Progress' %}selected{% endif %}>In Progress</option>
+                          <option value="Resolved" {% if issue.current_status=='Resolved' %}selected{% endif %}>Resolved</option>
+                        </select>
+                      </div>
+                      <div class="field">
+                        <label for="after_image-{{ issue.id }}">Upload After-Fix Image</label>
+                        <input type="file" id="after_image-{{ issue.id }}" name="after_image" accept="image/*" />
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label for="remarks-{{ issue.id }}">Authority Remarks</label>
+                      <textarea id="remarks-{{ issue.id }}" name="remarks" rows="2" placeholder="Work order reference, field inspection notes, etc.">{{ issue.authority_remarks or '' }}</textarea>
+                    </div>
+                    <div class="form-actions right">
+                      <button type="submit" class="btn-primary btn-small">Save Update</button>
+                    </div>
+                  </form>
+                </div>
+              </details>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <h3>No issues found</h3>
+        <p>New citizen reports will appear here in real time.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+
+
+

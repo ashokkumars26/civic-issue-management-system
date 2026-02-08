@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Civic Issue Management System</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body class="theme-dark">
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-logo"></span>
+          <div class="brand-text">
+            <div class="brand-title">Civic Issue Mangement</div>
+            <div class="brand-subtitle">Smart Civic Issue Management</div>
+          </div>
+        </div>
+        <nav class="app-nav">
+          
+            <a href="/login" class="nav-link">Login</a>
+          
+        </nav>
+      </header>
+
+      <main class="app-main">
+        
+        
+        <div class="flash-container">
+          
+          <div class="flash flash-error">Error generating PDF report.</div>
+          
+          <div class="flash flash-error">Please log in to access this page.</div>
+          
+        </div>
+        
+        
+
+        
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1 class="login-title">Welcome Back</h1>
+      <p class="login-subtitle">Access your Civic Issue Management Dashboard</p>
+    </div>
+
+    <form method="POST" class="login-form" id="loginForm">
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" id="username" name="username" class="form-input" required placeholder="Enter your username">
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" name="password" class="form-input" required placeholder="Enter your password">
+      </div>
+
+      <div class="form-group">
+        <label for="role" class="form-label">Role</label>
+        <select id="role" name="role" class="form-select" required>
+          <option value="">Select your role</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+
+      <button type="submit" class="login-btn" id="loginBtn">
+        <span class="btn-text">Sign In</span>
+        <div class="btn-spinner" id="btnSpinner"></div>
+      </button>
+    </form>
+
+    
+    
+    <div class="error-messages">
+      
+      <div class="error-message error-error">Error generating PDF report.</div>
+      
+      <div class="error-message error-error">Please log in to access this page.</div>
+      
+    </div>
+    
+    
+
+    <div class="login-footer">
+      <p>Don't have an account? <a href="/register" class="register-link">Register here</a></p>
+      <p>Demo Credentials:</p>
+      <p><strong>User:</strong> user / password</p>
+      <p><strong>Admin:</strong> admin / admin123</p>
+    </div>
+  </div>
+</div>
+
+<style>
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 120px);
+  padding: 2rem;
+}
+
+.login-card {
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  padding: 3rem;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #4a5568;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-title {
+  color: #e2e8f0;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  color: #a0aec0;
+  font-size: 1rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-input, .form-select {
+  background: #1a202c;
+  border: 2px solid #4a5568;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 1rem;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.1);
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: #718096;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(66, 153, 225, 0.3);
+}
+
+.login-btn:active {
+  transform: translateY(0);
+}
+
+.btn-text {
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+
+.btn-spinner {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.error-messages {
+  margin-top: 1rem;
+}
+
+.error-message {
+  background: #fed7d7;
+  border: 1px solid #feb2b2;
+  border-radius: 6px;
+  color: #c53030;
+  font-size: 0.9rem;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.login-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #4a5568;
+  text-align: center;
+  color: #a0aec0;
+  font-size: 0.85rem;
+}
+
+.login-footer p {
+  margin: 0.25rem 0;
+}
+
+.login-footer strong {
+  color: #e2e8f0;
+}
+
+.register-link {
+  color: #63b3ed;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 1rem;
+  }
+
+  .login-card {
+    padding: 2rem;
+  }
+
+  .login-title {
+    font-size: 1.5rem;
+  }
+}
+</style>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  const btn = document.getElementById('loginBtn');
+  const btnText = document.querySelector('.btn-text');
+  const spinner = document.getElementById('btnSpinner');
+
+  btn.disabled = true;
+  btnText.style.opacity = '0';
+  spinner.style.display = 'block';
+
+  // Re-enable after 2 seconds if no redirect (for demo purposes)
+  setTimeout(() => {
+    btn.disabled = false;
+    btnText.style.opacity = '1';
+    spinner.style.display = 'none';
+  }, 2000);
+});
+</script>
+
+      </main>
+
+      <footer class="app-footer">
+        <span>Prototype - Dark-Themed AI-Assisted Civic Issue Management </span>
+      </footer>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+  </body>
+  </html>
+
+
+

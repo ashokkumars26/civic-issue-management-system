@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="layout-grid">
+  <div class="card card-accent">
+    <h2 class="card-title">Report a New Civic Issue</h2>
+    <p class="card-subtitle">Help to stay clean, safe, and efficient.</p>
+    <form class="form-grid" method="POST" action="{{ url_for('report_issue') }}" enctype="multipart/form-data">
+      <div class="form-section">
+        <h3 class="section-title">Citizen Details</h3>
+        <div class="field">
+          <label for="name">Name (optional)</label>
+          <input type="text" id="name" name="name" placeholder="Your name" />
+        </div>
+        <div class="field-grid-two">
+          <div class="field">
+            <label for="email">Email (for notifications)</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" />
+          </div>
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input type="text" id="phone" name="phone" placeholder="+91-XXXXXXXXXX" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 class="section-title">Issue Details</h3>
+        <div class="field">
+          <label for="issue_type">Issue Type <span class="required">*</span></label>
+          <select id="issue_type" name="issue_type" required>
+            <option value="">Select an issue type</option>
+            {% for it in issue_types %}
+            <option value="{{ it }}">{{ it }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="issue_description">Issue Description <span class="required">*</span></label>
+          <textarea id="issue_description" name="issue_description" rows="4" required placeholder="Explain the issue clearly, including severity and impact."></textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 class="section-title">Location</h3>
+        <div class="field">
+          <label for="area">Area in Chennai <span class="required">*</span></label>
+          <select id="area" name="area" required>
+            <option value="">Select area</option>
+            {% for area in areas %}
+            <option value="{{ area }}">{{ area }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field-grid-two">
+          <div class="field">
+            <label for="street">Street Name</label>
+            <input type="text" id="street" name="street" placeholder="Street or road name" />
+          </div>
+          <div class="field">
+            <label for="landmark">Nearby Landmark</label>
+            <input type="text" id="landmark" name="landmark" placeholder="E.g., Near bus stop, temple, school" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 class="section-title">Attachments</h3>
+        <div class="field">
+          <label for="before_image">Upload Photo (optional)</label>
+          <input type="file" id="before_image" name="before_image" accept="image/*" />
+          <p class="field-hint">Adding a clear image helps authorities act faster.</p>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Submit Issue</button>
+        <button type="reset" class="btn-ghost">Reset</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Your Reported Issues</h2>
+    <p class="card-subtitle">Track status, view AI insights, and download official reports.</p>
+    <div class="issues-list">
+      {% if issues %}
+      {% for issue in issues %}
+      <article class="issue-card">
+        <header class="issue-header">
+          <div>
+            <h3>#{{ issue.id }} - {{ issue.issue_type }}</h3>
+            <p class="issue-meta">{{ issue.area }} • {{ issue.street or 'Street N/A' }} •
+              {{ issue.created_at.strftime('%d %b %Y, %I:%M %p') }}</p>
+          </div>
+          <span class="status-pill status-{{ issue.current_status|lower }}">{{ issue.current_status }}</span>
+        </header>
+
+        <p class="issue-description">{{ issue.description }}</p>
+
+        {% if issue.ai_summary %}
+        <div class="ai-summary">
+          <div class="ai-badge">AI Analysis</div>
+          <pre>{{ issue.ai_summary }}</pre>
+        </div>
+        {% endif %}
+
+        <div class="timeline">
+          <div class="timeline-line"></div>
+          {% for log in issue.status_logs %}
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">{{ log.status }}</div>
+              <div class="timeline-meta">{{ log.created_at.strftime('%d %b %Y, %I:%M %p') }}</div>
+              {% if log.remarks %}
+              <div class="timeline-remarks">{{ log.remarks }}</div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="issue-media">
+          <div class="media-column">
+            <h4>Before</h4>
+            {% if issue.before_image %}
+            <img src="{{ url_for('static', filename=issue.before_image.split('static/')[-1]) }}" alt="Before image" />
+            {% else %}
+            <div class="media-placeholder">No image</div>
+            {% endif %}
+          </div>
+          <div class="media-column">
+            <h4>After</h4>
+            {% if issue.after_image %}
+            <img src="{{ url_for('static', filename=issue.after_image.split('static/')[-1]) }}" alt="After image" />
+            {% else %}
+            <div class="media-placeholder">Not updated yet</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="issue-actions">
+          <a class="btn-secondary" href="{{ url_for('download_issue_pdf', issue_id=issue.id) }}">Download PDF Report</a>
+        </div>
+
+        {% if issue.current_status.lower() == 'resolved' and not issue.feedbacks %}
+        <form class="feedback-form" method="POST" action="{{ url_for('submit_feedback', issue_id=issue.id) }}">
+          <h4>Rate the Resolution</h4>
+          <div class="rating-group">
+            {% for r in range(1,6) %}
+            <label>
+              <input type="radio" name="rating" value="{{ r }}" required />
+              <span>{{ r }}</span>
+            </label>
+            {% endfor %}
+          </div>
+          <div class="field">
+            <label for="comments-{{ issue.id }}">Feedback (optional)</label>
+            <textarea id="comments-{{ issue.id }}" name="comments" rows="2" placeholder="Share your experience."></textarea>
+          </div>
+          <button type="submit" class="btn-primary btn-small">Submit Feedback</button>
+        </form>
+        {% elif issue.feedbacks %}
+        <div class="feedback-summary">
+          <h4>Feedback Submitted</h4>
+          <p>Rating: {{ issue.feedbacks[0].rating }}/5</p>
+          {% if issue.feedbacks[0].comments %}
+          <p>Comments: {{ issue.feedbacks[0].comments }}</p>
+          {% endif %}
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+      {% else %}
+      <div class="empty-state">
+        <h3>No issues reported yet</h3>
+        <p>Use the form on the left to submit your first civic issue.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+
+
+
